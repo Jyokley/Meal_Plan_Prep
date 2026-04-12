@@ -1,0 +1,2 @@
+-- Optional: add INSERT statements here for local dev fixtures.
+-- Runs after migrations when you use `npm run db:reset` (Supabase local).
