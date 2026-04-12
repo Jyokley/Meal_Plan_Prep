@@ -1,6 +1,7 @@
 {
   "name": "meal-plan-app",
   "version": "0.1.0",
+  "description": "Household meal planning: recipes, meal plan, shopping lists, and grocery budget.",
   "private": true,
   "scripts": {
     "dev": "next dev",
