@@ -9,6 +9,8 @@ export type IngredientInput = {
   unit: string;
   name: string;
   notes: string;
+  /** kcal for this ingredient line in the full recipe */
+  calories_kcal?: number | null;
 };
 
 export async function saveRecipeAction(input: {
@@ -17,6 +19,7 @@ export async function saveRecipeAction(input: {
   instructions: string;
   servings: number;
   ingredients: IngredientInput[];
+  source_url?: string | null;
 }) {
   const supabase = await createClient();
   const ctx = await getPrimaryHousehold(supabase);
@@ -29,6 +32,10 @@ export async function saveRecipeAction(input: {
   const title = input.title.trim();
   if (!title) throw new Error("Title is required");
   const servings = input.servings > 0 ? input.servings : 1;
+  const sourceUrl =
+    input.source_url != null && input.source_url.trim() !== ""
+      ? input.source_url.trim()
+      : null;
 
   let recipeId = input.id;
 
@@ -39,6 +46,7 @@ export async function saveRecipeAction(input: {
         title,
         instructions: input.instructions,
         servings,
+        source_url: sourceUrl,
         updated_at: new Date().toISOString(),
       })
       .eq("id", recipeId)
@@ -53,6 +61,7 @@ export async function saveRecipeAction(input: {
         title,
         instructions: input.instructions,
         servings,
+        source_url: sourceUrl,
         created_by: user?.id ?? null,
       })
       .select("id")
@@ -70,6 +79,12 @@ export async function saveRecipeAction(input: {
       unit: i.unit.trim(),
       name: i.name.trim(),
       notes: i.notes.trim() || null,
+      calories_kcal:
+        i.calories_kcal != null &&
+        Number.isFinite(i.calories_kcal) &&
+        i.calories_kcal >= 0
+          ? i.calories_kcal
+          : null,
     }));
 
   if (rows.length) {
@@ -79,6 +94,7 @@ export async function saveRecipeAction(input: {
 
   revalidatePath("/recipes");
   revalidatePath(`/recipes/${recipeId}`);
+  revalidatePath("/plan");
   return recipeId!;
 }
 
@@ -95,4 +111,5 @@ export async function deleteRecipeAction(recipeId: string) {
 
   if (error) throw new Error(error.message);
   revalidatePath("/recipes");
+  revalidatePath("/plan");
 }

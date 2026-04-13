@@ -1,4 +1,4 @@
-import { RecipeEditor } from "../recipe-editor";
+import { NewRecipeWithImport } from "../new-recipe-with-import";
 
 export default function NewRecipePage() {
   return (
@@ -8,12 +8,21 @@ export default function NewRecipePage() {
           New recipe
         </h1>
         <p className="mt-2 text-zinc-600 dark:text-zinc-400">
-          Ingredient amounts are for the full batch. Set total servings the recipe
-          makes; on the meal plan you enter how many portions you need, and shopping
-          lists scale amounts by portions ÷ recipe servings.
+          Import from a link when the page publishes structured recipe data, or add
+          everything by hand. Ingredient amounts are for the full batch; set total
+          servings the recipe makes. On the meal plan you choose portions, and
+          shopping lists scale by portions ÷ servings. Optional:{" "}
+          <strong className="font-medium text-zinc-800 dark:text-zinc-200">
+            Estimate (USDA)
+          </strong>{" "}
+          on ingredients (set{" "}
+          <code className="rounded bg-zinc-100 px-1 text-sm dark:bg-zinc-800">
+            USDA_FDC_API_KEY
+          </code>
+          ).
         </p>
       </div>
-      <RecipeEditor />
+      <NewRecipeWithImport />
     </div>
   );
 }

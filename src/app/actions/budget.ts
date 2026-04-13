@@ -29,6 +29,10 @@ export async function addGroceryExpenseAction(input: {
   if (error) throw new Error(error.message);
   revalidatePath("/budget");
   revalidatePath("/");
+  revalidatePath("/lists");
+  if (input.shoppingListId) {
+    revalidatePath(`/lists/${input.shoppingListId}`);
+  }
 }
 
 export async function deleteGroceryExpenseAction(id: string) {
@@ -45,4 +49,5 @@ export async function deleteGroceryExpenseAction(id: string) {
   if (error) throw new Error(error.message);
   revalidatePath("/budget");
   revalidatePath("/");
+  revalidatePath("/lists");
 }

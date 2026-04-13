@@ -29,13 +29,31 @@ export default async function PlanPage({
 
   const { data: plannedRaw } = await supabase
     .from("planned_meals")
-    .select("id, plan_date, meal_slot, servings_multiplier, recipe_id, recipes(title)")
+    .select("id, plan_date, meal_slot, servings_multiplier, recipe_id, recipes(title, servings)")
     .eq("household_id", ctx.household.id)
     .gte("plan_date", startStr)
     .lte("plan_date", endStr)
     .order("plan_date", { ascending: true });
 
   const planned = plannedRaw ?? [];
+
+  const recipeIds = [...new Set(planned.map((p) => p.recipe_id))];
+  const recipeCalorieTotals = new Map<string, number>();
+  if (recipeIds.length > 0) {
+    const { data: calRows } = await supabase
+      .from("recipe_ingredients")
+      .select("recipe_id, calories_kcal")
+      .in("recipe_id", recipeIds);
+    for (const row of calRows ?? []) {
+      if (row.calories_kcal == null) continue;
+      const add = Number(row.calories_kcal);
+      if (!Number.isFinite(add) || add <= 0) continue;
+      recipeCalorieTotals.set(
+        row.recipe_id,
+        (recipeCalorieTotals.get(row.recipe_id) ?? 0) + add,
+      );
+    }
+  }
 
   const { data: recipeOptions } = await supabase
     .from("recipes")
@@ -54,13 +72,35 @@ export default async function PlanPage({
   );
 
   const plannedItems: PlannedMealItem[] = planned.map((row) => {
-    const r = row.recipes as unknown as { title: string } | null;
+    const r = row.recipes as unknown as {
+      title: string;
+      servings: number;
+    } | null;
+    const recipeTotal = recipeCalorieTotals.get(row.recipe_id) ?? null;
+    const baseServings =
+      r?.servings != null && Number(r.servings) > 0 ? Number(r.servings) : 1;
+    const portions = Number(row.servings_multiplier);
+    let meal_calories_kcal: number | null = null;
+    if (
+      recipeTotal != null &&
+      recipeTotal > 0 &&
+      baseServings > 0 &&
+      Number.isFinite(portions) &&
+      portions > 0
+    ) {
+      const mealTotalKcal = (recipeTotal / baseServings) * portions;
+      // Per person: split evenly when portions ≥ 1 (e.g. 2 people → half the meal each).
+      // For fractional portions (< 1), treat as one person’s partial serving.
+      meal_calories_kcal =
+        portions >= 1 ? mealTotalKcal / portions : mealTotalKcal;
+    }
     return {
       id: row.id,
       plan_date: row.plan_date,
       meal_slot: row.meal_slot as MealSlot,
       servings_multiplier: row.servings_multiplier,
       recipe_title: r?.title ?? "Recipe",
+      meal_calories_kcal,
     };
   });
 

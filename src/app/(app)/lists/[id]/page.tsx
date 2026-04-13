@@ -1,8 +1,9 @@
 import { createClient } from "@/lib/supabase/server";
 import { getPrimaryHousehold } from "@/lib/household";
 import type { ShoppingListItem } from "@/types/database";
-import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import { ExpenseForm } from "@/app/(app)/budget/expense-form";
+import Link from "next/link";
 import { AddListItemForm } from "./add-list-item-form";
 import { DeleteListButton } from "./delete-list-button";
 import { ShoppingListBody } from "./shopping-list-body";
@@ -72,6 +73,31 @@ export default async function ListDetailPage({
           Add item
         </p>
         <AddListItemForm listId={list.id} />
+      </div>
+
+      <div className="rounded-2xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-950 sm:rounded-xl sm:p-6">
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+          Log this trip
+        </h2>
+        <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+          After you shop, enter the total here. It counts toward your monthly grocery
+          budget and stays linked to this list.
+        </p>
+        <ExpenseForm
+          defaultDate={new Date().toISOString().slice(0, 10)}
+          lists={[]}
+          fixedListId={list.id}
+          embedOnList
+        />
+        <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
+          <Link
+            href="/budget"
+            className="font-medium text-emerald-600 hover:underline dark:text-emerald-400"
+          >
+            Open budget
+          </Link>{" "}
+          to see all expenses.
+        </p>
       </div>
     </div>
   );

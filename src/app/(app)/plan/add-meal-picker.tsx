@@ -228,9 +228,12 @@ export function AddMealPicker({
                 Portions for this meal
               </label>
               <p className="mb-2 text-xs text-zinc-500 dark:text-zinc-400">
-                How many servings you need from this recipe. Shopping lists use this
-                with the recipe’s total servings to scale ingredient amounts (e.g. recipe
-                serves 12 and you enter 2 → one sixth of each ingredient).
+                How many servings you need from this recipe. Shopping lists scale
+                ingredients with the recipe’s total servings (e.g. recipe serves 12 and
+                you enter 2 → one sixth of each ingredient). On the meal plan, calories
+                use this as the number of people sharing the meal when it’s 1 or more
+                (total food calories are divided evenly so daily totals reflect one
+                person’s intake).
               </p>
               <input
                 id="plan-mult"

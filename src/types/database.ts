@@ -35,6 +35,8 @@ export type RecipeIngredient = {
   unit: string;
   name: string;
   notes: string | null;
+  /** kcal for this line in the full recipe batch (null if not set) */
+  calories_kcal?: number | null;
 };
 
 export type PlannedMeal = {
