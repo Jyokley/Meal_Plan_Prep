@@ -1,11 +1,11 @@
 "use client";
 
+import { useAuthReady } from "@/app/auth-provider";
 import { createHouseholdAction, joinHouseholdAction } from "@/app/actions/household";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export function OnboardingForms() {
-  const router = useRouter();
+  const authReady = useAuthReady();
   const [createError, setCreateError] = useState<string | null>(null);
   const [joinError, setJoinError] = useState<string | null>(null);
   const [pending, setPending] = useState<"create" | "join" | null>(null);
@@ -15,10 +15,10 @@ export function OnboardingForms() {
     setCreateError(null);
     setPending("create");
     const fd = new FormData(e.currentTarget);
+    const name = String(fd.get("name") ?? "").trim();
     try {
-      await createHouseholdAction(fd);
-      router.push("/");
-      router.refresh();
+      await createHouseholdAction(name);
+      window.location.assign("/");
     } catch (err) {
       setCreateError(err instanceof Error ? err.message : "Something went wrong");
     } finally {
@@ -31,10 +31,10 @@ export function OnboardingForms() {
     setJoinError(null);
     setPending("join");
     const fd = new FormData(e.currentTarget);
+    const code = String(fd.get("code") ?? "").trim();
     try {
-      await joinHouseholdAction(fd);
-      router.push("/");
-      router.refresh();
+      await joinHouseholdAction(code);
+      window.location.assign("/");
     } catch (err) {
       setJoinError(err instanceof Error ? err.message : "Something went wrong");
     } finally {
@@ -44,6 +44,9 @@ export function OnboardingForms() {
 
   return (
     <div className="mt-8 space-y-10">
+      {!authReady ? (
+        <p className="text-sm text-zinc-500 dark:text-zinc-400">Connecting…</p>
+      ) : null}
       <section>
         <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
           Create household
@@ -52,12 +55,13 @@ export function OnboardingForms() {
           <input
             name="name"
             required
+            disabled={!authReady}
             placeholder="Household name"
-            className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-zinc-900 outline-none ring-emerald-500/40 focus:border-emerald-500 focus:ring-2 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+            className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-zinc-900 outline-none ring-emerald-500/40 focus:border-emerald-500 focus:ring-2 disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
           />
           <button
             type="submit"
-            disabled={pending !== null}
+            disabled={!authReady || pending !== null}
             className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 disabled:opacity-60"
           >
             {pending === "create" ? "Creating…" : "Create"}
@@ -87,13 +91,14 @@ export function OnboardingForms() {
           <input
             name="code"
             required
+            disabled={!authReady}
             placeholder="Invite code"
-            className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 font-mono text-zinc-900 outline-none ring-emerald-500/40 focus:border-emerald-500 focus:ring-2 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+            className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 font-mono text-zinc-900 outline-none ring-emerald-500/40 focus:border-emerald-500 focus:ring-2 disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
             autoCapitalize="characters"
           />
           <button
             type="submit"
-            disabled={pending !== null}
+            disabled={!authReady || pending !== null}
             className="rounded-lg border border-zinc-300 px-4 py-2 text-sm font-medium text-zinc-800 hover:bg-zinc-50 disabled:opacity-60 dark:border-zinc-600 dark:text-zinc-200 dark:hover:bg-zinc-900"
           >
             {pending === "join" ? "Joining…" : "Join household"}

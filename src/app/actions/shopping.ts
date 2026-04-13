@@ -8,6 +8,37 @@ function mergeKey(name: string, unit: string) {
   return `${name.trim().toLowerCase()}||${unit.trim().toLowerCase()}`;
 }
 
+/** Ingredient amounts are for the full recipe yield; scale by portions needed vs that yield. */
+function ingredientScaleFactor(
+  plannedPortions: number,
+  recipeYieldServings: number,
+): number {
+  const portions = plannedPortions > 0 ? plannedPortions : 1;
+  const yieldServings =
+    Number.isFinite(recipeYieldServings) && recipeYieldServings > 0
+      ? recipeYieldServings
+      : 1;
+  return portions / yieldServings;
+}
+
+/** Snap float noise (e.g. 0.999999 → 1) and cap fractional precision for grocery amounts. */
+function tidyAmountForGroceries(n: number): number {
+  if (!Number.isFinite(n)) return n;
+  if (n === 0) return 0;
+
+  const snapInteger = (x: number) => {
+    const nearest = Math.round(x);
+    const diff = Math.abs(x - nearest);
+    const tol = Math.max(1e-5, 1e-9 * Math.max(1, Math.abs(x)));
+    return diff <= tol ? nearest : x;
+  };
+
+  let x = snapInteger(n);
+  x = Math.round(x * 10000) / 10000;
+  x = snapInteger(x);
+  return Object.is(x, -0) ? 0 : x;
+}
+
 export async function createEmptyListAction(name: string) {
   const supabase = await createClient();
   const ctx = await getPrimaryHousehold(supabase);
@@ -80,8 +111,12 @@ export async function generateShoppingListAction(input: {
   >();
 
   for (const pm of planned ?? []) {
-    if (!recipeMap.has(pm.recipe_id)) continue;
-    const factor = Number(pm.servings_multiplier) || 1;
+    const recipe = recipeMap.get(pm.recipe_id);
+    if (!recipe) continue;
+    const factor = ingredientScaleFactor(
+      Number(pm.servings_multiplier),
+      Number(recipe.servings),
+    );
     const ingRows = byRecipe.get(pm.recipe_id) ?? [];
     for (const ing of ingRows) {
       const raw = ing.amount != null ? Number(ing.amount) * factor : null;
@@ -122,15 +157,17 @@ export async function generateShoppingListAction(input: {
   if (lErr) throw new Error(lErr.message);
 
   const items = [...merged.values()].map((m, idx) => {
+    const amount =
+      m.amount > 0 ? tidyAmountForGroceries(m.amount) : 0;
     const parts: string[] = [];
-    if (m.amount > 0) parts.push(String(m.amount));
+    if (amount > 0) parts.push(String(amount));
     if (m.unit) parts.push(m.unit);
     parts.push(m.name);
     const display = parts.join(" ");
     return {
       list_id: listRow.id,
       display_text: display,
-      amount: m.amount > 0 ? m.amount : null,
+      amount: amount > 0 ? amount : null,
       unit: m.unit,
       name: m.name,
       checked: false,

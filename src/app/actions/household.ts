@@ -4,30 +4,30 @@ import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-export async function createHouseholdAction(formData: FormData) {
-  const name = String(formData.get("name") ?? "").trim();
-  if (!name) throw new Error("Name is required");
+export async function createHouseholdAction(name: string) {
+  const trimmed = name.trim();
+  if (!trimmed) throw new Error("Name is required");
 
   const supabase = await createClient();
-  const { data, error } = await supabase.rpc("create_household", {
+  const { error } = await supabase.rpc("create_household", {
     p_name: name,
   });
   if (error) throw new Error(error.message);
   revalidatePath("/", "layout");
-  return data as string;
+  revalidatePath("/onboarding");
 }
 
-export async function joinHouseholdAction(formData: FormData) {
-  const code = String(formData.get("code") ?? "").trim();
-  if (!code) throw new Error("Invite code is required");
+export async function joinHouseholdAction(code: string) {
+  const trimmed = code.trim();
+  if (!trimmed) throw new Error("Invite code is required");
 
   const supabase = await createClient();
-  const { data, error } = await supabase.rpc("join_household_by_code", {
-    p_code: code,
+  const { error } = await supabase.rpc("join_household_by_code", {
+    p_code: trimmed,
   });
   if (error) throw new Error(error.message);
   revalidatePath("/", "layout");
-  return data as string;
+  revalidatePath("/onboarding");
 }
 
 export async function rotateInviteAction(householdId: string) {
@@ -67,5 +67,5 @@ export async function updateHouseholdBudgetAction(
 export async function signOutAction() {
   const supabase = await createClient();
   await supabase.auth.signOut();
-  redirect("/login");
+  redirect("/");
 }

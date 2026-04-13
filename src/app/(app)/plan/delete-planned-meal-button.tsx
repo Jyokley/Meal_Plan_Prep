@@ -24,7 +24,7 @@ export function DeletePlannedMealButton({ id }: { id: string }) {
       type="button"
       onClick={onClick}
       disabled={pending}
-      className="shrink-0 text-zinc-400 hover:text-red-600 disabled:opacity-50 dark:hover:text-red-400"
+      className="flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-lg text-zinc-400 hover:bg-zinc-100 hover:text-red-600 disabled:opacity-50 dark:hover:bg-zinc-800 dark:hover:text-red-400"
       title="Remove"
       aria-label="Remove meal"
     >

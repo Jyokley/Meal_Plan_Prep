@@ -8,8 +8,9 @@ export default function NewRecipePage() {
           New recipe
         </h1>
         <p className="mt-2 text-zinc-600 dark:text-zinc-400">
-          Amounts are for the whole recipe; the meal planner scales them with your
-          serving multiplier.
+          Ingredient amounts are for the full batch. Set total servings the recipe
+          makes; on the meal plan you enter how many portions you need, and shopping
+          lists scale amounts by portions ÷ recipe servings.
         </p>
       </div>
       <RecipeEditor />

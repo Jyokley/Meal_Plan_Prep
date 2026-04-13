@@ -5,7 +5,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { AddListItemForm } from "./add-list-item-form";
 import { DeleteListButton } from "./delete-list-button";
-import { ListItemRow } from "./list-item-row";
+import { ShoppingListBody } from "./shopping-list-body";
 
 export default async function ListDetailPage({
   params,
@@ -33,16 +33,16 @@ export default async function ListDetailPage({
     .order("sort_order", { ascending: true });
 
   return (
-    <div className="mx-auto w-full max-w-2xl space-y-8">
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
+    <div className="mx-auto w-full max-w-2xl space-y-6 pb-8 sm:space-y-8 sm:pb-0">
+      <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
+        <div className="min-w-0 flex-1">
           <Link
             href="/lists"
-            className="text-sm font-medium text-emerald-600 hover:underline dark:text-emerald-400"
+            className="-mx-2 inline-flex min-h-[44px] items-center px-2 text-base font-medium text-emerald-600 hover:underline sm:text-sm dark:text-emerald-400"
           >
             ← All lists
           </Link>
-          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
+          <h1 className="mt-1 text-2xl font-semibold tracking-tight text-zinc-900 sm:mt-2 sm:text-3xl dark:text-zinc-50">
             {list.name}
           </h1>
           {list.generated_from_start && list.generated_from_end ? (
@@ -54,23 +54,25 @@ export default async function ListDetailPage({
         <DeleteListButton listId={list.id} />
       </div>
 
-      <ul className="space-y-1 rounded-xl border border-zinc-200 bg-white p-2 dark:border-zinc-800 dark:bg-zinc-950">
+      <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-950 sm:rounded-xl">
         {(items ?? []).length === 0 ? (
-          <li className="px-3 py-8 text-center text-sm text-zinc-500 dark:text-zinc-400">
+          <p className="px-4 py-12 text-center text-base text-zinc-500 dark:text-zinc-400">
             No items yet. Add something below.
-          </li>
+          </p>
         ) : (
-          (items ?? []).map((item) => (
-            <ListItemRow
-              key={item.id}
-              item={item as ShoppingListItem}
-              listId={list.id}
-            />
-          ))
+          <ShoppingListBody
+            items={(items ?? []) as ShoppingListItem[]}
+            listId={list.id}
+          />
         )}
-      </ul>
+      </div>
 
-      <AddListItemForm listId={list.id} />
+      <div className="rounded-2xl border border-zinc-200 bg-zinc-50/80 p-4 dark:border-zinc-800 dark:bg-zinc-900/40 sm:rounded-xl">
+        <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+          Add item
+        </p>
+        <AddListItemForm listId={list.id} />
+      </div>
     </div>
   );
 }

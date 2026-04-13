@@ -27,26 +27,27 @@ export function AddListItemForm({ listId }: { listId: string }) {
   return (
     <form
       onSubmit={onSubmit}
-      className="flex flex-wrap gap-2 rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-950"
+      className="flex flex-col gap-3 touch-manipulation sm:flex-row sm:flex-wrap sm:gap-2"
     >
       <input
         value={name}
         onChange={(e) => setName(e.target.value)}
         placeholder="Item name"
-        className="min-w-[10rem] flex-1 rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+        enterKeyHint="done"
+        className="min-h-[48px] w-full flex-1 rounded-xl border border-zinc-300 bg-white px-4 py-3 text-base dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 sm:min-h-0 sm:rounded-lg sm:px-3 sm:py-2 sm:text-sm"
       />
       <input
         value={unit}
         onChange={(e) => setUnit(e.target.value)}
         placeholder="Unit (optional)"
-        className="w-28 rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+        className="min-h-[48px] w-full rounded-xl border border-zinc-300 bg-white px-4 py-3 text-base dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 sm:h-auto sm:w-32 sm:min-h-0 sm:rounded-lg sm:px-3 sm:py-2 sm:text-sm"
       />
       <button
         type="submit"
         disabled={pending}
-        className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 disabled:opacity-60"
+        className="min-h-[48px] w-full rounded-xl bg-emerald-600 px-4 py-3 text-base font-medium text-white hover:bg-emerald-700 disabled:opacity-60 sm:w-auto sm:min-h-0 sm:rounded-lg sm:py-2 sm:text-sm"
       >
-        Add
+        Add item
       </button>
     </form>
   );

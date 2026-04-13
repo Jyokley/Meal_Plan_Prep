@@ -25,7 +25,7 @@ export function DeleteListButton({ listId }: { listId: string }) {
       type="button"
       onClick={onClick}
       disabled={pending}
-      className="rounded-lg border border-red-200 px-3 py-2 text-sm font-medium text-red-700 hover:bg-red-50 disabled:opacity-60 dark:border-red-900 dark:text-red-400 dark:hover:bg-red-950/40"
+      className="w-full min-h-[48px] shrink-0 rounded-xl border border-red-200 px-4 py-3 text-base font-medium text-red-700 hover:bg-red-50 disabled:opacity-60 sm:w-auto sm:min-h-0 sm:rounded-lg sm:px-3 sm:py-2 sm:text-sm dark:border-red-900 dark:text-red-400 dark:hover:bg-red-950/40"
     >
       Delete list
     </button>

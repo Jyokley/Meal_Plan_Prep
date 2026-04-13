@@ -25,23 +25,29 @@ export function ListItemRow({
   }
 
   return (
-    <li className="flex items-center gap-3 rounded-lg px-2 py-2 hover:bg-zinc-50 dark:hover:bg-zinc-900/50">
-      <input
-        type="checkbox"
-        checked={item.checked}
-        onChange={onToggle}
-        disabled={pending}
-        className="size-4 rounded border-zinc-400 text-emerald-600 focus:ring-emerald-500"
-      />
-      <span
-        className={`flex-1 text-sm ${
-          item.checked
-            ? "text-zinc-400 line-through dark:text-zinc-500"
-            : "text-zinc-900 dark:text-zinc-100"
-        }`}
+    <li className="touch-manipulation">
+      <label
+        className={`flex min-h-[3.25rem] cursor-pointer items-center gap-4 px-4 py-3.5 transition active:bg-zinc-100 sm:min-h-12 sm:gap-3 sm:px-3 sm:py-2.5 dark:active:bg-zinc-800/80 ${
+          item.checked ? "bg-zinc-50/80 dark:bg-zinc-900/40" : "bg-white dark:bg-zinc-950"
+        } ${pending ? "opacity-60" : ""}`}
       >
-        {label}
-      </span>
+        <input
+          type="checkbox"
+          checked={item.checked}
+          onChange={onToggle}
+          disabled={pending}
+          className="size-6 shrink-0 rounded-md border-2 border-zinc-400 text-emerald-600 focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-white dark:border-zinc-500 dark:focus:ring-offset-zinc-950 sm:size-5"
+        />
+        <span
+          className={`flex-1 text-base leading-snug sm:text-sm ${
+            item.checked
+              ? "text-zinc-400 line-through dark:text-zinc-500"
+              : "text-zinc-900 dark:text-zinc-100"
+          }`}
+        >
+          {label}
+        </span>
+      </label>
     </li>
   );
 }
